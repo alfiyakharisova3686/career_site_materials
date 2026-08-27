@@ -122,7 +122,6 @@ func sendAboutText(bot *tgbotapi.BotAPI, chatID int64, messageID int) {
 		{Text: "Вернуться в меню", Data: "btn_back_to_menu"},
 		{Text: "Синдром самозванца в карьере", Data: "start_test_imposter"},
 		{Text: "Подобрать формат помощи", Data: "start_test_helpFormat"},
-		{Text: "helpFormat", Data: "start_test_helpFormat"},
 	})
 
 	urlHelpFormat := tgbotapi.NewInlineKeyboardButtonURL("Форматы работы", "https://t.me/proforientacia_alfiya/61")
