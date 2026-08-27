@@ -1,0 +1,37 @@
+# Env
+.env
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Docs / Media
+*.pdf
+*.doc
+*.docx
+*.xls
+*.xlsx
+
+# Build / Artifacts
+bin/
+dist/
+tmp/
+*.log
+
+# Docker
+docker-compose.override.yml
