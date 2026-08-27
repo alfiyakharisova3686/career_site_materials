@@ -326,18 +326,23 @@ func handleCallback(bot *tgbotapi.BotAPI, query *tgbotapi.CallbackQuery) {
 		sendExitConfirmation(bot, chatID, messageID)
 
 	case data == "btn_cancel_exit":
-		sendNextQuestion(bot, chatID, messageID, getSession(chatID))
+		session := getSession(chatID)
+		if session == nil {
+			sendMainMenu(bot, chatID, messageID)
+			return
+		}
+		sendNextQuestion(bot, chatID, messageID, session)
 
 	case data == "btn_about":
 		sendAboutText(bot, chatID, messageID)
+
+	case strings.HasPrefix(data, "start_test_helpFormat"):
+		sendDescriptionHelpFormat(bot, chatID, messageID)
 
 	case strings.HasPrefix(data, "start_test_"):
 		testID := strings.TrimPrefix(data, "start_test_")
 		sendTestDescription(bot, chatID, messageID, testID)
 
-	case strings.HasPrefix(data, "start_test_helpFormat"):
-		sendDescriptionHelpFormat(bot, chatID, messageID)
-	
 	case strings.HasPrefix(data, "begin_test_helpFormat"):
 		newSessionHelpFormat(chatID)
 		sendNextQuestionHelpFormat(bot, chatID, messageID, sessionsHelpFormat[chatID])
@@ -345,15 +350,23 @@ func handleCallback(bot *tgbotapi.BotAPI, query *tgbotapi.CallbackQuery) {
 	case strings.HasPrefix(data, "nav_"):
 		parts := strings.Split(data, "_")
 		session := getSessionHelpFormat(chatID)
+		if session == nil {
+			sendDescriptionHelpFormat(bot, chatID, messageID)
+			return
+		}
 		question, _ := strconv.Atoi(parts[1])
 		answer, _ := strconv.Atoi(parts[2])
 		session.CallbackData = append(session.CallbackData, fmt.Sprintf("q_%d_%d", question, answer))
 		beginTestHelpFormat(bot, chatID, question, answer)
-		
+
 		session.CurrentStep += 1
-		if session.CurrentStep > 5 {
+		if session.CurrentStep >= len(helpFormatTest.Questions) {
 			resultHelpFormat(bot, chatID, messageID)
+			mu.Lock()
 			delete(sessionsHelpFormat, chatID)
+			mu.Unlock()
+		} else {
+			sendNextQuestionHelpFormat(bot, chatID, messageID, session)
 		}
 
 	case strings.HasPrefix(data, "begin_test_"):
@@ -369,6 +382,10 @@ func handleCallback(bot *tgbotapi.BotAPI, query *tgbotapi.CallbackQuery) {
 		}
 
 		session := getSession(chatID)
+		if session == nil {
+			sendTestDescription(bot, chatID, messageID, "imposter")
+			return
+		}
 
 		text := "Вы отметили, что сильнее всего это чувствуется " + allTests[session.TestID].ContextResult[answer]
 
@@ -383,6 +400,10 @@ func handleCallback(bot *tgbotapi.BotAPI, query *tgbotapi.CallbackQuery) {
 		}
 
 		session := getSession(chatID)
+		if session == nil {
+			sendTestDescription(bot, chatID, messageID, "imposter")
+			return
+		}
 		session.Points = append(session.Points, answer)
 		session.CurrentStep++
 
@@ -410,6 +431,7 @@ func main() {
 	if webhookURL == "" {
 		log.Fatal("Не задан WEBHOOK_URL")
 	}
+	webhookURL = strings.TrimRight(webhookURL, "/")
 
 	port := os.Getenv("WEBHOOK_PORT")
 	if port == "" {
@@ -470,4 +492,3 @@ func main() {
 		}
 	}
 }
-

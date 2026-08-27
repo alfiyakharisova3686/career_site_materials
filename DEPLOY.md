@@ -37,6 +37,15 @@ TELEGRAM_BOT_API=123456:ABC-DEF...
 WEBHOOK_URL=https://твойдомен.ru
 WEBHOOK_PORT=8443
 ```
+Важно:
+- `TELEGRAM_BOT_API` указывай без слова `bot`.
+- `WEBHOOK_URL` должен быть реальным публичным HTTPS-доменом без пути, например `https://example.ru`.
+- Не оставляй значения из примера вроде `your-real-domain.example`.
+
+Быстрая проверка:
+```bash
+grep -E 'TELEGRAM_BOT_API|WEBHOOK_URL|WEBHOOK_PORT' .env
+```
 
 ## 6. Настрой Nginx
 
@@ -92,6 +101,12 @@ cd /opt/career_bot
 docker compose up -d --build
 ```
 
+Проверь, что контейнер запущен:
+```bash
+docker compose ps
+docker compose logs --tail=100
+```
+
 ## 9. Проверь что всё работает
 ```bash
 # Логи бота
@@ -102,6 +117,16 @@ systemctl status nginx
 
 # Проверь вебхук
 curl https://api.telegram.org/bot<ТВОЙ_ТОКЕН>/getWebhookInfo
+```
+
+В `getWebhookInfo` поле `url` должно быть вида:
+```
+https://твойдомен.ru/bot<ТВОЙ_ТОКЕН>
+```
+Если `url` пустой, содержит тестовый домен или в `last_error_message` есть ошибка Nginx/SSL, исправь `.env`, затем перезапусти:
+```bash
+docker compose up -d --build
+docker compose logs --tail=100
 ```
 
 ## Полезные команды

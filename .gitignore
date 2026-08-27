@@ -2,6 +2,7 @@
 .env
 
 # Go
+.gocache/
 *.exe
 *.exe~
 *.dll

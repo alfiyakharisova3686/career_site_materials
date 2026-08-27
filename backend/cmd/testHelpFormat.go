@@ -67,7 +67,7 @@ func sendNextQuestionHelpFormat(bot *tgbotapi.BotAPI, chatID int64, messageID in
 	exitBtn := tgbotapi.NewInlineKeyboardButtonData("Вернуться в меню", "btn_back_to_menu_helpFormat")
 	btns.InlineKeyboard = append(btns.InlineKeyboard, tgbotapi.NewInlineKeyboardRow(exitBtn))
 
-	text := fmt.Sprintf("<b>Вопрос %d из %d</b>\n\n%s", session.CurrentStep, len(helpFormatTest.Questions), helpFormatTest.Questions[session.CurrentStep])
+	text := fmt.Sprintf("<b>Вопрос %d из %d</b>\n\n%s", session.CurrentStep+1, len(helpFormatTest.Questions), helpFormatTest.Questions[session.CurrentStep])
 
 	renderScreen(bot, chatID, messageID, text, btns)
 }
@@ -217,8 +217,8 @@ func resultHelpFormat(bot *tgbotapi.BotAPI, chatID int64, messageID int) {
 		text1 = helpFormatTest.ResultTexts["CONSULTING"]
 		primaryKey = "CONSULTING"
 		text2 = fmt.Sprintf("<b>Также можно рассмотреть:</b> %s\n\n%s",
-                    helpFormatTest.SecondaryName["RESUME"],
-                    helpFormatTest.SecondaryReason["RESUME"])
+			helpFormatTest.SecondaryName["RESUME"],
+			helpFormatTest.SecondaryReason["RESUME"])
 
 	case slices.Contains(session.CallbackData, "q_4_0") && (session.Hypotheses > session.Consulting-2):
 		text1 = helpFormatTest.ResultTexts["HYPOTHESES"]
@@ -248,7 +248,7 @@ func resultHelpFormat(bot *tgbotapi.BotAPI, chatID int64, messageID int) {
 		case equalCount >= 3:
 			text1 = helpFormatTest.ResultTexts["NEUTRAL"]
 			primaryKey = "NEUTRAL"
-		
+
 		case equalCount == 2:
 			if points["HYPOTHESES"] == maxPoint && points["CONSULTING"] == maxPoint {
 				if slices.Contains(session.CallbackData, "q_4_0") {
@@ -257,16 +257,16 @@ func resultHelpFormat(bot *tgbotapi.BotAPI, chatID int64, messageID int) {
 					maxKey = "CONSULTING"
 				}
 			} else {
-			for key, value := range points {
-				if value == maxPoint && key != maxKey {
-					if session.Q0Code == key {
-						maxKey = key
-					} else if session.Q0Code != maxKey && session.Q3Code == key {
-						maxKey = key
+				for key, value := range points {
+					if value == maxPoint && key != maxKey {
+						if session.Q0Code == key {
+							maxKey = key
+						} else if session.Q0Code != maxKey && session.Q3Code == key {
+							maxKey = key
+						}
+						break
 					}
-					break
 				}
-			}
 			}
 			text1 = helpFormatTest.ResultTexts[maxKey]
 
@@ -278,18 +278,18 @@ func resultHelpFormat(bot *tgbotapi.BotAPI, chatID int64, messageID int) {
 
 	if text2 == "" && primaryKey != "DISMISSAL" && primaryKey != "NEUTRAL" {
 		allowedPairs := map[string][]string{
-        "CONSULTING": {"RESUME", "BARRIERS"},
-        "SUPPORT":    {"BARRIERS"},
-    	}
+			"CONSULTING": {"RESUME", "BARRIERS"},
+			"SUPPORT":    {"BARRIERS"},
+		}
 
 		if allowed, ok := allowedPairs[primaryKey]; ok {
-        for _, code := range allowed {
-            score := points[code]
-            if points[primaryKey]-score <= 2 && score > 0 {
-                text2 = fmt.Sprintf("<b>Также можно рассмотреть:</b> %s\n\n%s", helpFormatTest.SecondaryName[code], helpFormatTest.SecondaryReason[code])
-                break
-            }
-        }
+			for _, code := range allowed {
+				score := points[code]
+				if points[primaryKey]-score <= 2 && score > 0 {
+					text2 = fmt.Sprintf("<b>Также можно рассмотреть:</b> %s\n\n%s", helpFormatTest.SecondaryName[code], helpFormatTest.SecondaryReason[code])
+					break
+				}
+			}
 		}
 	}
 
@@ -305,6 +305,5 @@ func resultHelpFormat(bot *tgbotapi.BotAPI, chatID int64, messageID int) {
 	} else {
 		renderScreen(bot, chatID, messageID, text1, btns)
 	}
-	
-}
 
+}
