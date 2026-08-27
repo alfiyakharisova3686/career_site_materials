@@ -53,7 +53,7 @@ func sendDescriptionHelpFormat(bot *tgbotapi.BotAPI, chatID int64, messageID int
 		{Text: "Вернуться в меню", Data: "btn_back_to_menu_helpFormat"},
 	})
 
-	text := fmt.Sprintf("<b>%s</b>\n\n%s", helpFormatTest.Name, helpFormatTest.Description)
+	text := fmt.Sprintf("%s", helpFormatTest.Description)
 	renderScreen(bot, chatID, messageID, text, btns)
 }
 
