@@ -59,15 +59,18 @@ func sendDescriptionHelpFormat(bot *tgbotapi.BotAPI, chatID int64, messageID int
 
 func sendNextQuestionHelpFormat(bot *tgbotapi.BotAPI, chatID int64, messageID int, session *SessionHelpFormat) {
 	btns := buildKeyboard([]Btn{})
-	for i, answer := range helpFormatTest.Answers[session.CurrentStep] {
-		newBtn := tgbotapi.NewInlineKeyboardButtonData(answer, fmt.Sprintf("nav_%d_%d", session.CurrentStep, i))
+	for i := range helpFormatTest.Answers[session.CurrentStep] {
+		newBtn := tgbotapi.NewInlineKeyboardButtonData(fmt.Sprintf("%d", i+1), fmt.Sprintf("nav_%d_%d", session.CurrentStep, i))
 		btns.InlineKeyboard = append(btns.InlineKeyboard, tgbotapi.NewInlineKeyboardRow(newBtn))
 	}
 
 	exitBtn := tgbotapi.NewInlineKeyboardButtonData("Вернуться в меню", "btn_back_to_menu_helpFormat")
 	btns.InlineKeyboard = append(btns.InlineKeyboard, tgbotapi.NewInlineKeyboardRow(exitBtn))
 
-	text := fmt.Sprintf("<b>Вопрос %d из %d</b>\n\n%s", session.CurrentStep+1, len(helpFormatTest.Questions), helpFormatTest.Questions[session.CurrentStep])
+	text := fmt.Sprintf("<b>Вопрос %d из %d</b>\n\n%s\n\n", session.CurrentStep+1, len(helpFormatTest.Questions), helpFormatTest.Questions[session.CurrentStep])
+	for i, answer := range helpFormatTest.Answers[session.CurrentStep] {
+		text += fmt.Sprintf("<b>%d.</b> %s\n\n", i+1, answer)
+	}
 
 	renderScreen(bot, chatID, messageID, text, btns)
 }
