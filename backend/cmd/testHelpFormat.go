@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"slices"
+	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -197,7 +198,7 @@ func beginTestHelpFormat(bot *tgbotapi.BotAPI, chatID int64, question int, answe
 	}
 }
 
-func resultHelpFormat(bot *tgbotapi.BotAPI, chatID int64, messageID int) {
+func resultHelpFormat(bot *tgbotapi.BotAPI, chatID int64, messageID int, user *tgbotapi.User) {
 	session := getSessionHelpFormat(chatID)
 	var text1, text2, primaryKey string
 	points := map[string]int{"SUPPORT": session.Support, "HYPOTHESES": session.Hypotheses, "BARRIERS": session.Barriers, "DISMISSAL": session.Dismissal, "RESUME": session.Resume, "CONSULTING": session.Consulting}
@@ -301,6 +302,15 @@ func resultHelpFormat(bot *tgbotapi.BotAPI, chatID int64, messageID int) {
 	urlChannel := tgbotapi.NewInlineKeyboardButtonURL("Подробнее о форматах работы", "https://t.me/proforientacia_alfiya/61")
 	btns.InlineKeyboard = append(btns.InlineKeyboard, tgbotapi.NewInlineKeyboardRow(urlAccount))
 	btns.InlineKeyboard = append(btns.InlineKeyboard, tgbotapi.NewInlineKeyboardRow(urlChannel))
+
+	// Отправляем письмо заказчику асинхронно
+	sendResultEmail(EmailData{
+		User:         user,
+		TestName:     "Подобрать формат помощи",
+		ResultMain:   text1,
+		ResultDetail: text2,
+		CompletedAt:  time.Now(),
+	})
 
 	if text2 != "" {
 		renderScreen(bot, chatID, messageID, text1, buildKeyboard([]Btn{}))

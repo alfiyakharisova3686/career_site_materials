@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/joho/godotenv"
@@ -234,7 +235,7 @@ func maxSum(values []int) (maxIndexes []int, maxValue int) {
 	return maxIndexes, maxValue
 }
 
-func sendResultTestImposter(bot *tgbotapi.BotAPI, chatID int64, messageID int, session *Session) {
+func sendResultTestImposter(bot *tgbotapi.BotAPI, chatID int64, messageID int, session *Session, user *tgbotapi.User) {
 	resultSum := 0
 	for _, val := range session.Points {
 		resultSum += val
@@ -283,6 +284,15 @@ func sendResultTestImposter(bot *tgbotapi.BotAPI, chatID int64, messageID int, s
 			allTests[session.TestID].ResultTitle[3], resultSum, allTests[session.TestID].ResultText[3], session.CareerContext)
 
 	}
+
+	// Отправляем письмо заказчику асинхронно
+	sendResultEmail(EmailData{
+		User:         user,
+		TestName:     "Синдром самозванца в карьере",
+		ResultMain:   text1,
+		ResultDetail: text2,
+		CompletedAt:  time.Now(),
+	})
 
 	renderScreen(bot, chatID, messageID, text1, buildKeyboard([]Btn{}))
 
@@ -360,7 +370,7 @@ func handleCallback(bot *tgbotapi.BotAPI, query *tgbotapi.CallbackQuery) {
 
 		session.CurrentStep += 1
 		if session.CurrentStep >= len(helpFormatTest.Questions) {
-			resultHelpFormat(bot, chatID, messageID)
+			resultHelpFormat(bot, chatID, messageID, query.From)
 			mu.Lock()
 			delete(sessionsHelpFormat, chatID)
 			mu.Unlock()
@@ -408,7 +418,7 @@ func handleCallback(bot *tgbotapi.BotAPI, query *tgbotapi.CallbackQuery) {
 
 		test := allTests[session.TestID]
 		if session.CurrentStep > len(test.Questions) {
-			sendResultTestImposter(bot, chatID, messageID, session)
+			sendResultTestImposter(bot, chatID, messageID, session, query.From)
 		} else {
 			sendNextQuestion(bot, chatID, messageID, session)
 		}
