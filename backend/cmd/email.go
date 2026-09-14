@@ -84,6 +84,14 @@ func buildEmailHTML(data EmailData, userName string) string {
 		</div>`, newlineToBreak(data.ResultDetail))
 	}
 
+	userLinkBlock := ""
+	if data.User.UserName != "" {
+		userLinkBlock = fmt.Sprintf(
+			`<p style="margin-top:20px;"><a href="https://t.me/%s" style="color:#4a4a8a;font-weight:bold;">✉️ Написать пользователю в Telegram</a></p>`,
+			data.User.UserName,
+		)
+	}
+
 	return fmt.Sprintf(`<!DOCTYPE html>
 <html lang="ru">
 <head><meta charset="UTF-8"></head>
@@ -122,6 +130,7 @@ func buildEmailHTML(data EmailData, userName string) string {
           </div>
 
           %s
+          %s
 
         </td></tr>
 
@@ -140,5 +149,6 @@ func buildEmailHTML(data EmailData, userName string) string {
 		data.CompletedAt.Format("02.01.2006 в 15:04 MST"),
 		newlineToBreak(data.ResultMain),
 		detailBlock,
+		userLinkBlock,
 	)
 }
