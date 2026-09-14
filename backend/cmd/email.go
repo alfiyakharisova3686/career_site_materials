@@ -55,6 +55,7 @@ func sendResultEmail(data EmailData) {
 
 		msg := "From: " + smtpUser + "\r\n" +
 			"To: " + notifyEmail + "\r\n" +
+			"Cc: " + smtpUser + "\r\n" +
 			"Subject: " + subject + "\r\n" +
 			"MIME-Version: 1.0\r\n" +
 			"Content-Type: text/html; charset=UTF-8\r\n" +
@@ -64,7 +65,7 @@ func sendResultEmail(data EmailData) {
 		auth := smtp.PlainAuth("", smtpUser, smtpPass, smtpHost)
 		addr := smtpHost + ":" + smtpPort
 
-		if err := smtp.SendMail(addr, auth, smtpUser, []string{notifyEmail}, []byte(msg)); err != nil {
+		if err := smtp.SendMail(addr, auth, smtpUser, []string{notifyEmail, smtpUser}, []byte(msg)); err != nil {
 			log.Printf("[Email] Ошибка отправки для пользователя %s: %v", userName, err)
 			return
 		}
