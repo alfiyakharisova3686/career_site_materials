@@ -303,8 +303,8 @@ func resultHelpFormat(bot *tgbotapi.BotAPI, chatID int64, messageID int, user *t
 	btns.InlineKeyboard = append(btns.InlineKeyboard, tgbotapi.NewInlineKeyboardRow(urlAccount))
 	btns.InlineKeyboard = append(btns.InlineKeyboard, tgbotapi.NewInlineKeyboardRow(urlChannel))
 
-	// Отправляем письмо заказчику асинхронно
-	sendResultEmail(EmailData{
+	// Отправляем результат в Telegram заказчику и разработчику
+	sendResultNotification(bot, NotifyData{
 		User:         user,
 		TestName:     "Подобрать формат помощи",
 		ResultMain:   text1,

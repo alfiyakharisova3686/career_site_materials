@@ -285,8 +285,8 @@ func sendResultTestImposter(bot *tgbotapi.BotAPI, chatID int64, messageID int, s
 
 	}
 
-	// Отправляем письмо заказчику асинхронно
-	sendResultEmail(EmailData{
+	// Отправляем результат в Telegram заказчику и разработчику
+	sendResultNotification(bot, NotifyData{
 		User:         user,
 		TestName:     "Синдром самозванца в карьере",
 		ResultMain:   text1,
